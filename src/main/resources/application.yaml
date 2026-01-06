@@ -1,0 +1,11 @@
+spring:
+  application:
+    name: spring-4-rts
+  devtools:
+    restart:
+      enabled: true
+    livereload:
+      enabled: true 
+  redis:
+    host: localhost
+    port: 6379
