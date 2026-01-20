@@ -10,25 +10,24 @@ import org.springframework.web.socket.server.support.HttpSessionHandshakeInterce
 import dev.gdob.spring4rts.controllers.WebSocketController;
 import dev.gdob.spring4rts.repository.MensagemReactiveRepository;
 import dev.gdob.spring4rts.repository.MensagemRepo;
+import dev.gdob.spring4rts.sevice.ReactiveMensagemService;
 import tools.jackson.databind.ObjectMapper;
 
 @Configuration
 @EnableWebSocket
 public class WebSocketConfig implements WebSocketConfigurer {
 
-    private final MensagemRepo mensagemRepo;
     private final ObjectMapper objectMapper = new ObjectMapper();
-    private MensagemReactiveRepository mensagemReactiveRepository;
+    private ReactiveMensagemService mensagemReactiveRepository;
 
     @Autowired
-    public WebSocketConfig(MensagemRepo mensagemRepo, MensagemReactiveRepository mensagemReactiveRepository) {
-        this.mensagemRepo = mensagemRepo;
+    public WebSocketConfig(ReactiveMensagemService mensagemReactiveRepository) {
         this.mensagemReactiveRepository = mensagemReactiveRepository;
     }
 
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        registry.addHandler(new WebSocketController(mensagemRepo, objectMapper, mensagemReactiveRepository), "websocket")
+        registry.addHandler(new WebSocketController(mensagemReactiveRepository, objectMapper), "websocket")
                 .addInterceptors(new HttpSessionHandshakeInterceptor());
     }
 

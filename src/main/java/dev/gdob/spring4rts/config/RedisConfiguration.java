@@ -76,7 +76,7 @@ class RedisConfiguration {
                     return mensagem;
                 })
                 .switchIfEmpty(Mono.error(new IllegalArgumentException()))
-                .flatMap(p -> mensagemRepo.save("mensagem", p))
+                .flatMap(p -> mensagemRepo.save(p))
                 .subscribe(c -> log.info("Mensagem saved."));
         return container;
     }

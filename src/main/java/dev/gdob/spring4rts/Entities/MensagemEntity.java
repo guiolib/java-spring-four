@@ -9,13 +9,23 @@ import dev.gdob.spring4rts.dto.MensagemDto;
 public class MensagemEntity {
 
     @Id
+    private String id;
     private String mensagem;
 
     public MensagemEntity() {
     }
 
     public MensagemEntity(String mensagem) {
+        this.id = java.util.UUID.randomUUID().toString();
         this.mensagem = mensagem;
+    }
+    public MensagemEntity(String id, String mensagem) {
+        this.id = id;
+        this.mensagem = mensagem;
+    }
+
+    public String getId() {
+        return id;
     }
 
     public String getMensagem() {
@@ -23,7 +33,7 @@ public class MensagemEntity {
     }
 
     public MensagemDto toDto() {
-        return new MensagemDto(this.mensagem);
+        return new MensagemDto(this.id, this.mensagem);
     }
 
 }
