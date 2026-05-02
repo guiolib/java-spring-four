@@ -22,6 +22,7 @@ import dev.gdob.spring4rts.Entities.MensagemEntity;
 import dev.gdob.spring4rts.dto.MensagemDto;
 import dev.gdob.spring4rts.repository.MensagemReactiveRepository;
 import reactor.core.publisher.Mono;
+import reactor.core.publisher.Sinks;
 import tools.jackson.databind.ObjectMapper;
 
 @Configuration
@@ -45,7 +46,7 @@ class RedisConfiguration {
     }
 
     @Bean
-    ReactiveRedisOperations<String, MensagemDto> redisOperations(ReactiveRedisConnectionFactory factory) {
+    public ReactiveRedisOperations<String, MensagemDto> redisOperations(ReactiveRedisConnectionFactory factory) {
         JacksonJsonRedisSerializer<MensagemDto> serializer = new JacksonJsonRedisSerializer(MensagemDto.class);
         RedisSerializationContext.RedisSerializationContextBuilder<String, MensagemDto> builder = RedisSerializationContext
                 .newSerializationContext(serializer);
@@ -64,21 +65,30 @@ class RedisConfiguration {
     }
 
     @Bean
-    public ReactiveRedisMessageListenerContainer redisMessageListenerContainer(MensagemReactiveRepository mensagemRepo,
-            ReactiveRedisConnectionFactory reactiveRedisConnectionFactory, ObjectMapper objectMapper) throws IOException {
-        ReactiveRedisMessageListenerContainer container = new ReactiveRedisMessageListenerContainer(
-                reactiveRedisConnectionFactory);
-                // container.receive(ChannelTopic.of("mensagem"));
+    public ReactiveRedisMessageListenerContainer redisMessageListenerContainer(
+            MensagemReactiveRepository mensagemRepo,
+            ReactiveRedisConnectionFactory reactiveRedisConnectionFactory,
+            ObjectMapper objectMapper,
+            Sinks.Many<MensagemDto> sink) throws IOException {
+        ReactiveRedisMessageListenerContainer container =
+                new ReactiveRedisMessageListenerContainer(reactiveRedisConnectionFactory);
+
         container.receive(ChannelTopic.of("mensagem"))
                 .map(p -> p.getMessage())
                 .map(m -> {
-                    MensagemEntity mensagem = objectMapper.readValue(m, MensagemEntity.class);
-                    return mensagem;
+                    return objectMapper.readValue(m, MensagemEntity.class);
                 })
-                .switchIfEmpty(Mono.error(new IllegalArgumentException()))
-                .flatMap(p -> mensagemRepo.save(p))
-                .subscribe(c -> log.info("Mensagem saved."));
+                .flatMap(mensagem -> mensagemRepo.save(mensagem)
+                        .map(MensagemEntity::toDto)
+                        .doOnNext(sink::tryEmitNext))
+                .subscribe(c -> log.info("Mensagem saved and emitted."));
+
         return container;
+    }
+
+    @Bean
+    public Sinks.Many<MensagemDto> sink() {
+        return Sinks.many().multicast().onBackpressureBuffer();
     }
 
 }

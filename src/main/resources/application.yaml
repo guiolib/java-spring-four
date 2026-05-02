@@ -1,11 +1,17 @@
+debug: true
 spring:
+  logging:
+    level: TRACE
+
   application:
     name: spring-4-rts
+  http:
+    log-request-details: true
   devtools:
     restart:
       enabled: true
     livereload:
-      enabled: true 
+      enabled: true
   redis:
     host: localhost
     port: 6379
