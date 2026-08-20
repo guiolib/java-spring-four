@@ -7,6 +7,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 // @EnableWebFlux
 public class Spring4RtsApplication {
 
+	
+
 	public static void main(String[] args) {
 		SpringApplication.run(Spring4RtsApplication.class, args);
 	}

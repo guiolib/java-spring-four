@@ -21,7 +21,6 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 import dev.gdob.spring4rts.Entities.MensagemEntity;
 import dev.gdob.spring4rts.dto.MensagemDto;
 import dev.gdob.spring4rts.repository.MensagemReactiveRepository;
-import reactor.core.publisher.Mono;
 import reactor.core.publisher.Sinks;
 import tools.jackson.databind.ObjectMapper;
 

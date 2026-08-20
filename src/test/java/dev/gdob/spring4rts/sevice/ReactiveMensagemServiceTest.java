@@ -29,7 +29,7 @@ class ReactiveMensagemServiceTest {
         // reference to verify emissions
         // unfortunately the sink field is private, so use reflection or rebuild
         // service manually for this test
-        sink = Sinks.many().multicast().onBackpressureBuffer();
+        // sink = Sinks.many().multicast().onBackpressureBuffer();
         // MensagemReactiveRepository repo = service.getClass()
         //         .getDeclaredFields()[1] // guess: repository field order
         //         .getType()
